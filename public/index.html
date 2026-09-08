@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Photography Portfolio | Instagram Feed</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container">
+      <h1 class="site-title">Lens & Light Photography</h1>
+      <p class="site-subtitle">Capturing moments that last forever</p>
+    </div>
+  </header>
+
+  <section class="hero">
+    <div class="container">
+      <h2>Latest From Instagram</h2>
+      <p>Fresh work, directly from our studio to your screen.</p>
+    </div>
+  </section>
+
+  <section id="instagram-feed" class="feed-section">
+    <div class="container">
+      <div id="feed-loading" class="loading-state">
+        <div class="spinner"></div>
+        <p>Loading latest posts...</p>
+      </div>
+
+      <div id="feed-error" class="error-state" style="display: none;">
+        <p class="error-icon">&#9888;</p>
+        <p class="error-message">Oops! Couldn't load Instagram posts.</p>
+        <button id="retry-btn" class="retry-btn">Try Again</button>
+      </div>
+
+      <div id="feed-empty" class="empty-state" style="display: none;">
+        <p>No posts available yet. Check back soon!</p>
+      </div>
+
+      <div id="feed-grid" class="feed-grid"></div>
+    </div>
+  </section>
+
+  <footer class="site-footer">
+    <div class="container">
+      <p>&copy; 2026 Lens & Light Photography. All rights reserved.</p>
+      <p class="footer-instagram">
+        <a href="https://instagram.com/" target="_blank" rel="noopener noreferrer">
+          Follow us on Instagram &rarr;
+        </a>
+      </p>
+    </div>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>

@@ -8,7 +8,12 @@
     "dev": "node --watch src/app.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "keywords": ["instagram", "api", "feed", "express"],
+  "keywords": [
+    "instagram",
+    "api",
+    "feed",
+    "express"
+  ],
   "license": "ISC",
   "type": "commonjs",
   "dependencies": {

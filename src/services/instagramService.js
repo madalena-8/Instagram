@@ -68,10 +68,17 @@ async function fetchFromInstagram() {
     return null;
   }
 
-  const url = `https://graph.instagram.com/v18.0/${ACCOUNT_ID}/media?fields=id,caption,media_url,thumbnail_url,permalink,media_type,timestamp&access_token=${ACCESS_TOKEN}&limit=20`;
+  const url =
+    'https://graph.instagram.com/me/media' +
+    '?fields=id,caption,media_url,thumbnail_url,permalink,media_type,timestamp' +
+    '&limit=20';
 
   try {
-    const response = await fetch(url);
+    const response = await fetch(url, {
+      headers: {
+        Authorization: `Bearer ${ACCESS_TOKEN}`
+      }
+    });
 
     if (!response.ok) {
       const errorText = await response.text();
@@ -109,8 +116,13 @@ async function getPosts() {
 
     return [];
   } catch (error) {
-    if (error.message.includes('status 401') || error.message.includes('status 403')) {
-      const customError = new Error('Invalid or expired Instagram credentials');
+    if (
+      error.message.includes('status 401') ||
+      error.message.includes('status 403')
+    ) {
+      const customError = new Error(
+        'Invalid or expired Instagram credentials'
+      );
       customError.statusCode = 502;
       customError.publicMessage = 'Unable to retrieve Instagram posts';
       throw customError;
@@ -120,7 +132,9 @@ async function getPosts() {
       throw error;
     }
 
-    const customError = new Error(`Failed to fetch Instagram posts: ${error.message}`);
+    const customError = new Error(
+      `Failed to fetch Instagram posts: ${error.message}`
+    );
     customError.statusCode = 502;
     customError.publicMessage = 'Unable to retrieve Instagram posts';
     throw customError;

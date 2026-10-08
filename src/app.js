@@ -47,11 +47,13 @@ app.use((err, req, res, next) => {
   });
 });
 
-app.listen(PORT, () => {
-  console.log(`Instagram Feed API running on port ${PORT}`);
-  console.log(`Health check: http://localhost:${PORT}/`);
-  console.log(`Posts endpoint: http://localhost:${PORT}/api/posts`);
-  console.log(`Demo website: http://localhost:${PORT}/demo/`);
-});
+if (require.main === module) {
+  app.listen(PORT, () => {
+    console.log(`Instagram Feed API running on port ${PORT}`);
+    console.log(`Health check: http://localhost:${PORT}/`);
+    console.log(`Posts endpoint: http://localhost:${PORT}/api/posts`);
+    console.log(`Demo website: http://localhost:${PORT}/demo/`);
+  });
+}
 
 module.exports = app;

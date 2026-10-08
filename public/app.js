@@ -40,42 +40,86 @@ function showState(state) {
   }
 }
 
+function safeUrl(value) {
+  if (typeof value !== 'string') return null;
+
+  try {
+    const url = new URL(value);
+
+    if (url.protocol !== 'https:' && url.protocol !== 'http:') {
+      return null;
+    }
+
+    return url.href;
+  } catch {
+    return null;
+  }
+}
+
 function createPostCard(post) {
   const card = document.createElement('a');
   card.className = 'post-card';
-  card.href = post.permalink || '#';
-  card.target = '_blank';
-  card.rel = 'noopener noreferrer';
 
-  let mediaHtml = '';
-  if (post.mediaType === 'VIDEO') {
-    mediaHtml = `<video src="${post.mediaUrl}" poster="" muted playsinline></video>`;
-  } else if (post.mediaType === 'CAROUSEL_ALBUM') {
-    mediaHtml = `<img src="${post.mediaUrl}" alt="${escapeHtml(post.caption || 'Instagram post')}" loading="lazy">`;
+  const permalink = safeUrl(post.permalink);
+  if (permalink) {
+    card.href = permalink;
+    card.target = '_blank';
+    card.rel = 'noopener noreferrer';
   } else {
-    mediaHtml = `<img src="${post.mediaUrl}" alt="${escapeHtml(post.caption || 'Instagram post')}" loading="lazy">`;
+    card.removeAttribute('href');
   }
 
-  let mediaBadge = '';
-  if (post.mediaType === 'VIDEO') {
-    mediaBadge = '<span class="media-type-badge">Video</span>';
-  } else if (post.mediaType === 'CAROUSEL_ALBUM') {
-    mediaBadge = '<span class="media-type-badge">Album</span>';
+  const mediaContainer = document.createElement('div');
+  mediaContainer.className = 'post-media';
+
+  const mediaUrl = safeUrl(post.mediaUrl);
+  const caption = typeof post.caption === 'string' ? post.caption : '';
+
+  if (mediaUrl) {
+    const isVideo = post.mediaType === 'VIDEO';
+    const media = document.createElement(isVideo ? 'video' : 'img');
+
+    media.src = mediaUrl;
+
+    if (isVideo) {
+      media.muted = true;
+      media.playsInline = true;
+    } else {
+      media.alt = caption || 'Instagram post';
+      media.loading = 'lazy';
+    }
+
+    mediaContainer.appendChild(media);
   }
 
-  card.innerHTML = `
-    <div class="post-media">
-      ${mediaHtml}
-      ${mediaBadge}
-    </div>
-    <div class="post-content">
-      <p class="post-caption">${escapeHtml(post.caption || '')}</p>
-      <div class="post-meta">
-        <span class="post-date">${formatDate(post.timestamp)}</span>
-        <span class="post-link">View on Instagram &rarr;</span>
-      </div>
-    </div>
-  `;
+  if (post.mediaType === 'VIDEO' || post.mediaType === 'CAROUSEL_ALBUM') {
+    const badge = document.createElement('span');
+    badge.className = 'media-type-badge';
+    badge.textContent = post.mediaType === 'VIDEO' ? 'Video' : 'Album';
+    mediaContainer.appendChild(badge);
+  }
+
+  const content = document.createElement('div');
+  content.className = 'post-content';
+
+  const captionEl = document.createElement('p');
+  captionEl.className = 'post-caption';
+  captionEl.textContent = caption;
+
+  const meta = document.createElement('div');
+  meta.className = 'post-meta';
+
+  const date = document.createElement('span');
+  date.className = 'post-date';
+  date.textContent = formatDate(post.timestamp);
+
+  const linkText = document.createElement('span');
+  linkText.className = 'post-link';
+  linkText.textContent = permalink ? 'View on Instagram →' : '';
+
+  meta.append(date, linkText);
+  content.append(captionEl, meta);
+  card.append(mediaContainer, content);
 
   return card;
 }
@@ -104,11 +148,17 @@ async function loadPosts() {
 
     const posts = await response.json();
 
-    if (!Array.isArray(posts) || posts.length === 0) {
-      showState('empty');
-      return;
-    }
+// The API must return an array of posts.
+if (!Array.isArray(posts)) {
+  throw new Error('Invalid API response: expected an array of posts');
+}
 
+// An empty array is valid, but there are no posts to display.
+if (posts.length === 0) {
+  gridEl.innerHTML = '';
+  showState('empty');
+  return;
+}
     gridEl.innerHTML = '';
     posts.forEach(post => {
       const card = createPostCard(post);
@@ -117,12 +167,16 @@ async function loadPosts() {
 
     showState('loaded');
 
-  } catch (error) {
-    console.error('Failed to load Instagram posts:', error);
-    showState('error');
-  }
+} catch (error) {
+  console.error('Failed to load Instagram posts:', error);
+  gridEl.innerHTML = '';
+  showState('error');
+}
 }
 
 retryBtn.addEventListener('click', loadPosts);
 
 document.addEventListener('DOMContentLoaded', loadPosts);
+if (typeof window !== 'undefined') {
+  window.__loadPostsForTesting = loadPosts;
+}

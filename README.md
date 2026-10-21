@@ -4,6 +4,7 @@
 **Project:** Instagram Feed API
 **Stack:** Node.js • Express.js • JavaScript • HTML/CSS
 **Status:** Planning / MVP Development
+**Demo:** [Live Demo](https://instagram-8hu8.onrender.com/demo/)
 
 ---
 
@@ -773,7 +774,7 @@ Instagram Feed API
     Cache
      │
  ┌───┼────┐
- ↓   ↓    ↓
+  ↓   ↓    ↓
 Website visitors
 ```
 
